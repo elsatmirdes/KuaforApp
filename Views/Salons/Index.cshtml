@@ -1,0 +1,42 @@
+﻿@model IEnumerable<KuaforApp.Models.Salon>
+
+<div class="container mt-5">
+    <h2>Salon Listesi</h2>
+    <a href="@Url.Action("Create", "Salons")" class="btn btn-success mb-3">Yeni Salon Ekle</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Address)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ContactNumber)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var salon in Model)
+            {
+                <tr>
+                    <td>@salon.Id</td>
+                    <td>@salon.Name</td>
+                    <td>@salon.Address</td>
+                    <td>@salon.ContactNumber</td>
+                    <td>
+                        <a href="@Url.Action("Edit", "Salons", new { id = salon.Id })" class="btn btn-primary btn-sm">Düzenle</a>
+                        <a href="@Url.Action("Delete", "Salons", new { id = salon.Id })" class="btn btn-danger btn-sm">Sil</a>
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@salon.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@salon.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@salon.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
