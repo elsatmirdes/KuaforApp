@@ -21,7 +21,7 @@ namespace KuaforApp.Controllers
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Employees.Include(e => e.Salon);
+            var applicationDbContext = _context.Employees;
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -34,7 +34,6 @@ namespace KuaforApp.Controllers
             }
 
             var employee = await _context.Employees
-                .Include(e => e.Salon)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
@@ -47,7 +46,12 @@ namespace KuaforApp.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["SalonId"] = new SelectList(_context.Salons, "Id", "Id");
+            var salons = _context.Salons.ToList(); // Tüm salonları çekiyoruz
+
+            ViewBag.salonsName = new SelectList(salons, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.salonsId = new SelectList(salons, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.salonsNumber = new SelectList(salons, "Id", "ContactNumber"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.salonsAddress = new SelectList(salons, "Id", "Address"); // SelectList: Id = Value, Name = Gösterilecek Değer
             return View();
         }
 
@@ -56,7 +60,7 @@ namespace KuaforApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Specialty,IsAvailable,SalonId")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,Name,Specialty,IsAvailable,SalonId,Role")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -64,7 +68,15 @@ namespace KuaforApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SalonId"] = new SelectList(_context.Salons, "Id", "Id", employee.SalonId);
+
+            var salons = _context.Salons.ToList(); // Tüm salonları çekiyoruz
+
+            ViewBag.salonsName = new SelectList(salons, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.salonsId = new SelectList(salons, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.salonsNumber = new SelectList(salons, "Id", "ContactNumber"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.salonsAddress = new SelectList(salons, "Id", "Address"); // SelectList: Id = Value, Name = Gösterilecek Değer
+
+
             return View(employee);
         }
 
@@ -130,7 +142,6 @@ namespace KuaforApp.Controllers
             }
 
             var employee = await _context.Employees
-                .Include(e => e.Salon)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {

@@ -9,7 +9,8 @@ namespace KuaforApp.Models
         public string Specialty { get; set; } // Uzmanlık alanı
         public bool IsAvailable { get; set; } // Müsaitlik
         public int SalonId { get; set; } // Hangi salona ait
-        public Salon Salon { get; set; }
+        public string Role { get; set; } = "E";
+
 
     }
 }

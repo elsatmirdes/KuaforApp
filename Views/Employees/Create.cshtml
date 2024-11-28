@@ -27,14 +27,68 @@
                     <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
                 </label>
             </div>
+
+            <!-- Salon Seçimi -->
             <div class="form-group">
-                <label asp-for="SalonId" class="control-label"></label>
-                <select asp-for="SalonId" class ="form-control" asp-items="ViewBag.SalonId"></select>
+                <label asp-for="SalonId" class="control-label">Salon Seç</label>
+                <select asp-for="SalonId" class="form-control" asp-items="ViewBag.salonsId" id="salonId" onchange="updateSalonDetails()">
+                    
+                </select>
             </div>
+
+            <!-- Salon Bilgileri -->
+
+            <div id="SalonDetails" style="margin-top: 20px;">
+                <p><strong>Salon Adı:</strong> <span id="SalonName"></span></p>
+                <p><strong>Telefon:</strong> <span id="SalonPhone"></span></p>
+                <p><strong>Adres:</strong> <span id="SalonAddress"></span></p>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
+
         </form>
+
+        <script>
+            // Salon verilerini ViewBag'den alıyoruz
+            // ViewBag'deki listeyi JavaScript değişkenine aktarıyoruz
+            var salonNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsName));
+            var salonAdress = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsAddress));
+            var salonNumber = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsNumber));
+            var salonId = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsId));
+
+ 
+
+
+            // Dropdown değiştiğinde çalışacak fonksiyon
+            function updateSalonDetails() {
+                var selectedId = document.getElementById("salonId").value;
+                // Liste üzerinde döngü ile işlem yapabiliriz
+                let sayac = 0;
+                salonId.forEach(function (id) {
+
+                    if (selectedId == id.Text) {
+                        console.log("Salon id:", id.Text);
+                        console.log("Salon id:", selectedId);
+                        console.log("Salan adı: ", salonAdress[sayac].Text)
+
+                        document.getElementById("SalonName").innerHTML = salonNames[sayac].Text;
+                        document.getElementById("SalonPhone").innerHTML = salonNumber[sayac].Text || "Telefon bilgisi yok";
+                        document.getElementById("SalonAddress").innerHTML = salonAdress[sayac].Text || "Adres bilgisi yok";
+                    }
+
+                    else {
+                        document.getElementById("SalonName").innerHTML = "Salon Seçilmedi";
+                        document.getElementById("SalonPhone").innerHTML = "--";
+                        document.getElementById("SalonAddress").innerHTML = "--";
+                    }
+                    sayac = sayac +1;
+                });
+
+            }
+        </script>
+
     </div>
 </div>
 
@@ -44,4 +98,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
 }
