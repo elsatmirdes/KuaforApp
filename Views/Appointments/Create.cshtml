@@ -10,22 +10,42 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
+
+
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
-                <label asp-for="SalonId" class="control-label"></label>
-                <input asp-for="SalonId" class="form-control" />
-                <span asp-validation-for="SalonId" class="text-danger"></span>
+
+                <label asp-for="EmployeeId" class="control-label">Çalışan Seç</label>
+                <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.employeesName" id="employeeId" onchange="updateEmployeeDetails()">
+                    <option>--Çalışan Seçiniz--</option>
+                </select>
+
+
+                
+                <br />
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Çalışanın Salonu</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>Salon Adı:</strong> <span id="salonName" class="text-muted">Henüz seçilmedi</span>
+                        </p>
+                    </div>
+                </div>
+                <br />
+
             </div>
             <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <input asp-for="EmployeeId" class="form-control" />
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Service" class="control-label"></label>
-                <input asp-for="Service" class="form-control" />
-                <span asp-validation-for="Service" class="text-danger"></span>
+
+
+                <label asp-for="Service" class="control-label">İşlem Seç</label>
+                <select asp-for="Service" class="form-control" id="service">
+                    <option>--İşlem Seçiniz--</option>
+                </select>
+
             </div>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
@@ -42,10 +62,53 @@
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
+
+        <script>
+            // Salon verilerini ViewBag'den alıyoruz
+            // ViewBag'deki listeyi JavaScript değişkenine aktarıyoruz
+            var employee = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.employeesId));
+            var specialty = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.specialty));
+
+            // Dictionary'leri JSON olarak JavaScript değişkenlerine atıyoruz
+            var salonNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SalonNames));
+            var employeeSalonID = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.EmployeeSalonID));
+
+            // Dropdown değiştiğinde çalışacak fonksiyon
+            function updateEmployeeDetails() {
+                var selectedId = document.getElementById("employeeId").value.trim();
+                // Liste üzerinde döngü ile işlem yapabiliriz
+                let sayac = 0
+                employee.forEach(function (id) {
+                    console.log(selectedId.toString() + " " + id.Text);
+                    if (selectedId.toString() == id.Text) {
+                        var opt = document.createElement('option');
+                        opt.value = specialty[sayac].Text;
+                        opt.innerHTML = specialty[sayac].Text;
+                        var i, L = document.getElementById("service").options.length - 1;
+                        for (i = L; i >= 0; i--) {
+                            document.getElementById("service").remove(i);
+                        }
+                        
+                        document.getElementById("service").appendChild(opt);
+                        // Employee ID'den Salon ID'yi bulma
+                        var salonId = employeeSalonID[selectedId];
+                        var salonName = salonNames[salonId];
+                        document.getElementById("salonName").innerHTML = salonName;
+                        
+                    }
+
+
+                    sayac++;
+                });
+
+            }
+        </script>
+
     </div>
 </div>
 
@@ -53,6 +116,3 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

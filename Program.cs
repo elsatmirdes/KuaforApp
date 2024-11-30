@@ -36,6 +36,8 @@ namespace KuaforApp
                 app.UseHsts();
             }
 
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

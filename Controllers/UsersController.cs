@@ -27,6 +27,30 @@ namespace KuaforApp.Controllers
             return View(await _context.Users.ToListAsync());
         }
 
+        public IActionResult forUserAddAppointment(int SalonId, int EmployeeId, string Service, DateTime Date, TimeSpan Time, decimal Price,int userId)
+        {
+            // Gelen randevu bilgilerini işleyin
+            // Örneğin, bir randevuyu veritabanına ekleyebilirsiniz
+            var ıd = Convert.ToInt32(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+            var appointment = new Appointment
+            {
+                SalonId = SalonId,
+                EmployeeId = EmployeeId,
+                Service = Service,
+                Date = Date,
+                Time = Time,
+                Price = Price,
+                UserId = ıd // Kullanıcı kimliğiyle ilişkilendirin
+        };
+
+            // Veritabanına kaydetme işlemi (örnek)
+            _context.Appointments.Update(appointment);
+            _context.SaveChanges();
+
+            // Kullanıcıyı bir başarı sayfasına yönlendirin
+            return RedirectToAction($"Details/{ıd}", "User");
+        }
+
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {

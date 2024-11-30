@@ -71,6 +71,8 @@ namespace KuaforApp.Controllers
 
             var salons = _context.Salons.ToList(); // Tüm salonları çekiyoruz
 
+
+            
             ViewBag.salonsName = new SelectList(salons, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsId = new SelectList(salons, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsNumber = new SelectList(salons, "Id", "ContactNumber"); // SelectList: Id = Value, Name = Gösterilecek Değer

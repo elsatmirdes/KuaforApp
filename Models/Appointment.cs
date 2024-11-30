@@ -7,14 +7,16 @@ namespace KuaforApp.Models
         public int Id { get; set; }
         public int SalonId { get; set; } // Kuaför/Berber
         public int EmployeeId { get; set; } // Çalışan
+#pragma warning disable CS8618 // Null atanamaz alan, oluşturucudan çıkış yaparken null olmayan bir değer içermelidir. Alanı null atanabilir olarak bildirmeyi düşünün.
         public string Service { get; set; } // İşlem
-        public DateTime Date { get; set; } // Tarih
+#pragma warning restore CS8618 // Null atanamaz alan, oluşturucudan çıkış yaparken null olmayan bir değer içermelidir. Alanı null atanabilir olarak bildirmeyi düşünün.
+        public DateTime Date { get; set; }// Tarih
         public TimeSpan Time { get; set; } // Saat
 
         public decimal Price { get; set; } // Ücret
 
         // seçen user ıd sini tutmak için randevu için user ıd ekliyoruz
-        public int UserId { get; set; }
+        public int UserId { get; set; } = -1;
 
     }
 }

@@ -5,42 +5,54 @@
 }
 
 <h1>Index</h1>
+@if (User.IsInRole("A"))
+{ 
+    <p>
+        <a href="@Url.Action("Create", "Appointments")" class="btn btn-success mb-3">Yeni Çalışan Ekle</a>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+    </p>
+}
+
 <table class="table">
     <thead>
+        <label for="date1">Tarih seçin : </label>
+        <input type="date" id="date1" name="birthday">
         <tr>
+
+
+
             <th>
-                @Html.DisplayNameFor(model => model.SalonId)
+                Salon
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EmployeeId)
+                Çalışan Adı
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Service)
+                İşlem
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                Randevu Tarihi
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Time)
+                İşlem Süresi
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                Ücret
             </th>
+
             <th></th>
         </tr>
     </thead>
     <tbody>
+
+
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.SalonId)
+                @ViewBag.SalonNames[item.SalonId]
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EmployeeId)
+                @ViewBag.EmployeeName[item.EmployeeId]
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Service)
@@ -52,13 +64,36 @@
                 @Html.DisplayFor(modelItem => item.Time)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                    @Html.DisplayFor(modelItem => item.Price) <p> TL</p>
             </td>
-            <td>
+
+                @if (User.IsInRole("U"))
+                {
+                    <td>
+                        <!-- Form -->
+                        <form method="post" action="@Url.Action("forUserAddAppointment", "User")">
+                            <input type="hidden" name="SalonId" value="@item.SalonId" />
+                            <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
+                            <input type="hidden" name="Service" value="@item.Service" />
+                            <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
+                            <input type="hidden" name="Time" value="@item.Time" />
+                            <input type="hidden" name="Price" value="@item.Price" />
+                            <button type="submit" class="btn btn-success mb-3">Randevu Al</button>
+                        </form>
+                    </td>
+                }
+
+
+                @if (User.IsInRole("A"))
+                {
+                    //here blocks that you want to show to users with Admin role
+                <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+                </td>
+                }
+
         </tr>
 }
     </tbody>

@@ -32,7 +32,7 @@
             <div class="form-group">
                 <label asp-for="SalonId" class="control-label">Salon Seç</label>
                 <select asp-for="SalonId" class="form-control" asp-items="ViewBag.salonsId" id="salonId" onchange="updateSalonDetails()">
-                    
+                    <option>--Salon Seçiniz--</option>
                 </select>
             </div>
 
@@ -63,25 +63,29 @@
 
             // Dropdown değiştiğinde çalışacak fonksiyon
             function updateSalonDetails() {
-                var selectedId = document.getElementById("salonId").value;
+                var selectedId = document.getElementById("salonId").value.trim();
                 // Liste üzerinde döngü ile işlem yapabiliriz
                 let sayac = 0;
                 salonId.forEach(function (id) {
 
-                    if (selectedId == id.Text) {
-                        console.log("Salon id:", id.Text);
-                        console.log("Salon id:", selectedId);
-                        console.log("Salan adı: ", salonAdress[sayac].Text)
+                    if (selectedId.toString() == id.Text) {
+                        
 
                         document.getElementById("SalonName").innerHTML = salonNames[sayac].Text;
                         document.getElementById("SalonPhone").innerHTML = salonNumber[sayac].Text || "Telefon bilgisi yok";
                         document.getElementById("SalonAddress").innerHTML = salonAdress[sayac].Text || "Adres bilgisi yok";
+
+                        
                     }
 
                     else {
-                        document.getElementById("SalonName").innerHTML = "Salon Seçilmedi";
-                        document.getElementById("SalonPhone").innerHTML = "--";
-                        document.getElementById("SalonAddress").innerHTML = "--";
+                        console.log("Salon id:", id.Text);
+                        console.log("Salon id:", selectedId);
+                        console.log("Salan adı: ", salonAdress[sayac].Text)
+
+                        // document.getElementById("SalonName").innerHTML = "Salon Seçilmedi";
+                        // document.getElementById("SalonPhone").innerHTML = "--";
+                        // document.getElementById("SalonAddress").innerHTML = "--";
                     }
                     sayac = sayac +1;
                 });

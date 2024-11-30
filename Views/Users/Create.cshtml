@@ -33,6 +33,16 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             
+
+            @if (User.IsInRole("A"))
+            {
+                <div class="form-group">
+                    <label asp-for="Role" class="control-label"></label>
+                    <input asp-for="Role" class="form-control" />
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
+            }
+
             <br />
 
 
