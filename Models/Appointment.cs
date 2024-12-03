@@ -15,6 +15,9 @@ namespace KuaforApp.Models
 
         public decimal Price { get; set; } // Ücret
 
+        //onaylandımı onaylanmadımı -1 reddedildi 0 bekliyor 1 kabul edildi
+        public int acceptAppointment { get; set; } = 0;
+
         // seçen user ıd sini tutmak için randevu için user ıd ekliyoruz
         public int UserId { get; set; } = -1;
 

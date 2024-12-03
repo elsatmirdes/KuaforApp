@@ -33,10 +33,11 @@ namespace KuaforApp.Controllers
                 ViewBag.ErrorMessage = "E-posta veya şifre hatalı.";
                 return View();
             }
-
+            
             // Kullanıcı bilgilerini sakla
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Kullanıcı ID'si
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role) // Rolü sakla

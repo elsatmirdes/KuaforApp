@@ -1,0 +1,37 @@
+﻿@model KuaforApp.Models.Appointment
+
+@{
+    ViewData["Title"] = "User Appointments";
+}
+
+<div class="list-group">
+    <br />
+
+    @foreach (var item in ViewBag.userAppointments)
+    {
+
+        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">@item.Date.ToString("dd-MM-yyyy H:mm")</h5>
+                
+            </div>
+            <p class="mb-1">Salon Adı : @ViewBag.SalonNames[item.SalonId]</p>
+            <p class="mb-1">Çalışan Adı : @ViewBag.EmployeeName[item.EmployeeId]</p>
+        </a>
+
+        @if (item.acceptAppointment == 0)
+        {
+            <p style="background-color:yellow;">Randevunuz çalışan tarafından onay bekliyor.</p>
+        }
+        @if (item.acceptAppointment == 1)
+        {
+            <p style="background-color:green;">Randevunuz çalışan tarafından onaylanmıştır.</p>
+        }
+        @if (item.acceptAppointment == -1)
+        {
+            <p style="background-color:orangered;">Randevunuz çalışan tarafından reddedildi.</p>
+        }
+        <br />
+    }
+</div>

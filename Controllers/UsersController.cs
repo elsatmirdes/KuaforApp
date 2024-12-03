@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KuaforApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace KuaforApp.Controllers
 {
@@ -27,29 +30,32 @@ namespace KuaforApp.Controllers
             return View(await _context.Users.ToListAsync());
         }
 
-        public IActionResult forUserAddAppointment(int SalonId, int EmployeeId, string Service, DateTime Date, TimeSpan Time, decimal Price,int userId)
+        
+        public async Task<IActionResult> forUserAddAppointment(int id, [Bind("Id,SalonId,EmployeeId,Service,Date,Time,Price")] Appointment appointment)
         {
-            // Gelen randevu bilgilerini işleyin
-            // Örneğin, bir randevuyu veritabanına ekleyebilirsiniz
-            var ıd = Convert.ToInt32(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
-            var appointment = new Appointment
+            if (id != appointment.Id)
             {
-                SalonId = SalonId,
-                EmployeeId = EmployeeId,
-                Service = Service,
-                Date = Date,
-                Time = Time,
-                Price = Price,
-                UserId = ıd // Kullanıcı kimliğiyle ilişkilendirin
-        };
+                return NotFound();
+            }
 
-            // Veritabanına kaydetme işlemi (örnek)
-            _context.Appointments.Update(appointment);
-            _context.SaveChanges();
-
-            // Kullanıcıyı bir başarı sayfasına yönlendirin
-            return RedirectToAction($"Details/{ıd}", "User");
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    appointment.UserId = Convert.ToInt32(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
+                    _context.Update(appointment);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return NotFound();
+                     
+                }
+                return View();
+            }
+            return View(appointment);
         }
+
 
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -90,6 +96,7 @@ namespace KuaforApp.Controllers
             }
             return View(user);
         }
+
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -186,5 +193,7 @@ namespace KuaforApp.Controllers
         {
             return RedirectToAction("Login","AccessDenied");
         }
+
+
     }
 }

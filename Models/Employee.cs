@@ -14,6 +14,7 @@ namespace KuaforApp.Models
         public bool IsAvailable { get; set; } // Müsaitlik
         public int SalonId { get; set; } // Hangi salona ait
         public string Role { get; set; } = "E";
+        public int userID { get; set; } = -1; 
 
 
     }

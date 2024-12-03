@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<KuaforApp.Models.Appointment>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Randevu İşlemleri";
 }
 
 <h1>Index</h1>
 @if (User.IsInRole("A"))
 { 
     <p>
-        <a href="@Url.Action("Create", "Appointments")" class="btn btn-success mb-3">Yeni Çalışan Ekle</a>
+        <a href="@Url.Action("Create", "Appointments")" class="btn btn-success mb-3">Yeni Randevu Ekle</a>
 
     </p>
 }
@@ -18,9 +18,6 @@
         <label for="date1">Tarih seçin : </label>
         <input type="date" id="date1" name="birthday">
         <tr>
-
-
-
             <th>
                 Salon
             </th>
@@ -71,7 +68,8 @@
                 {
                     <td>
                         <!-- Form -->
-                        <form method="post" action="@Url.Action("forUserAddAppointment", "User")">
+                        <form method="post" action="@Url.Action("forUserAddAppointment", "Users")">
+                            <input type="hidden" name="Id" value="@item.Id" />
                             <input type="hidden" name="SalonId" value="@item.SalonId" />
                             <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
                             <input type="hidden" name="Service" value="@item.Service" />
@@ -96,5 +94,22 @@
 
         </tr>
 }
+
     </tbody>
+
+
 </table>
+@if (User.IsInRole("U"))
+{
+    <form>
+        <button asp-controller="Appointments" asp-action="userAppointments" type="submit" class="btn btn-primary" style="width:150px">Randevularım</button>
+    </form>
+
+}
+
+@if (User.IsInRole("E"))
+{
+    <form>
+        <button asp-controller="Appointments" asp-action="EmployeeAppointments" type="submit" class="btn btn-primary" style="width:150px">Adıma Alınan Randevular</button>
+    </form>
+}

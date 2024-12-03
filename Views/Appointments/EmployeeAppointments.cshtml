@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewData["Title"] = "EmployeeAppointments";
+}
+
+<h1>EmployeeAppointments</h1>
+
+
+<div class="list-group">
+    <br />
+
+    @foreach (var item in ViewBag.employeeAppointments)
+    {
+
+        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Randevu Tarihi : @item.Date.ToString("dd-MM-yyyy H:mm")</h5>
+            </div>
+            <p>Müşteri Adı Soyadı : @ViewBag.userName[item.UserId]</p>
+            <p>Yapılacak İşlem : @item.Service</p>
+        </a>
+        <br />
+        <!-- Form -->
+        <form method="post" action="@Url.Action("acces_appointment", "Appointments")">
+            <input type="hidden" name="Id" value="@item.Id" />
+            <input type="hidden" name="SalonId" value="@item.SalonId" />
+            <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
+            <input type="hidden" name="Service" value="@item.Service" />
+            <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
+            <input type="hidden" name="Time" value="@item.Time" />
+            <input type="hidden" name="UserId" value="@item.UserId" />
+            <input type="hidden" name="Price" value="@item.Price" />
+            <input type="hidden" name="acceptAppointment" value="1" />
+            <button type="submit" class="btn btn-success mb-3">Randevuyu Onayla</button>
+        </form>
+
+    }
+
+</div>

@@ -17,6 +17,15 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
+
+            <!-- Salon Seçimi -->
+            <div class="form-group">
+                <label asp-for="userID" class="control-label">Çalışan Seç</label>
+                <select asp-for="userID" class="form-control" asp-items="ViewBag.userName" id="userID" onchange="updateSalonDetails()">
+                    <option>--Çalışan Seçiniz--</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label asp-for="Specialty" class="control-label"></label>
                 <input asp-for="Specialty" class="form-control" />
@@ -47,7 +56,6 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-
         </form>
 
         <script>
@@ -57,6 +65,7 @@
             var salonAdress = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsAddress));
             var salonNumber = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsNumber));
             var salonId = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.salonsId));
+
 
  
 

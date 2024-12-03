@@ -47,11 +47,15 @@ namespace KuaforApp.Controllers
         public IActionResult Create()
         {
             var salons = _context.Salons.ToList(); // Tüm salonları çekiyoruz
+            var userList = _context.Users.Where(r => r.Role == "E").ToList();
 
             ViewBag.salonsName = new SelectList(salons, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsId = new SelectList(salons, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsNumber = new SelectList(salons, "Id", "ContactNumber"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsAddress = new SelectList(salons, "Id", "Address"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.userID = new SelectList(userList, "Id", "Id");
+            ViewBag.userName = new SelectList(userList, "Id", "FullName");
+
             return View();
         }
 
@@ -60,7 +64,7 @@ namespace KuaforApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Specialty,IsAvailable,SalonId,Role")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,Name,Specialty,IsAvailable,SalonId,Role,userID")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -70,14 +74,18 @@ namespace KuaforApp.Controllers
             }
 
             var salons = _context.Salons.ToList(); // Tüm salonları çekiyoruz
+            var userList = _context.Users.Where(r => r.Role == "E").ToList();
 
 
-            
+
+
             ViewBag.salonsName = new SelectList(salons, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsId = new SelectList(salons, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsNumber = new SelectList(salons, "Id", "ContactNumber"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.salonsAddress = new SelectList(salons, "Id", "Address"); // SelectList: Id = Value, Name = Gösterilecek Değer
 
+            ViewBag.userID = new SelectList(userList, "Id", "Id");
+            ViewBag.userName = new SelectList(userList, "Id", "FullName");
 
             return View(employee);
         }

@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KuaforApp.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using NuGet.Versioning;
 
 namespace KuaforApp.Controllers
 {
@@ -24,7 +27,22 @@ namespace KuaforApp.Controllers
 
             ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
             ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
-            return View(await _context.Appointments.ToListAsync());
+
+            var appointments = _context.Appointments
+            .Select(a => new Appointment
+            {
+                Id = a.Id,
+                SalonId = a.SalonId,
+                EmployeeId = a.EmployeeId,
+                Service = a.Service,
+                Date = a.Date.ToLocalTime(), // UTC -> Yerel zaman dönüşümü
+                Time = a.Time,
+                Price = a.Price
+            })
+            .ToList();
+
+
+            return View(appointments);
         }
 
         // GET: Appointments/Details/5
@@ -90,7 +108,7 @@ namespace KuaforApp.Controllers
             var employees = _context.Employees.ToList();
             ViewBag.employee = employees;
 
-           
+
             ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
             ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
 
@@ -98,7 +116,89 @@ namespace KuaforApp.Controllers
             return View(appointment);
         }
 
+        //
 
+        [Authorize(Roles = "U")]
+        public IActionResult userAppointments()
+        {
+            var userID = Convert.ToInt32(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
+
+            ViewBag.userid = Convert.ToInt32(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
+            ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
+            ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+            ViewBag.userAppointments = _context.Appointments
+            .Where(a => a.UserId == userID)
+            .Select(a => new Appointment
+            {
+                Id = a.Id,
+                SalonId = a.SalonId,
+                EmployeeId = a.EmployeeId,
+                Service = a.Service,
+                Date = a.Date.ToLocalTime(), // Tarihi yerel zamana dönüştür
+                Time = a.Time,
+                Price = a.Price,
+                acceptAppointment = a.acceptAppointment,
+                UserId = a.UserId
+            })
+            .ToList();
+
+
+
+            return View();
+        }
+
+        [Authorize(Roles = "E")]
+        public IActionResult EmployeeAppointments()
+        {
+            var userID = Convert.ToInt32(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
+            var employeeID = Convert.ToInt32(_context.Employees.Where(e => e.userID == userID).Select(u => u.Id).FirstOrDefault());
+
+
+
+            ViewBag.employeeAppointments = _context.Appointments
+            .Where(a => a.EmployeeId == employeeID)
+            .Select(a => new Appointment
+            {
+                Id = a.Id,
+                SalonId = a.SalonId,
+                EmployeeId = a.EmployeeId,
+                Service = a.Service,
+                Date = a.Date.ToLocalTime(), // Tarihi yerel zamana dönüştür
+                Time = a.Time,
+                Price = a.Price,
+                acceptAppointment = a.acceptAppointment,
+                UserId = a.UserId
+            })
+            .ToList();
+
+            ViewBag.userName = _context.Users.ToDictionary(u => u.Id, u => u.FullName);
+
+            return View();
+        }
+
+        public async Task<IActionResult> acces_appointment(int id, [Bind("Id,SalonId,EmployeeId,Service,Date,Time,Price,acceptAppointment,UserId")] Appointment appointment)
+        {
+            if (id != appointment.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(appointment);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return NotFound();
+
+                }
+                return View();
+            }
+            return View(appointment);
+        }
 
         // GET: Appointments/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -184,7 +284,7 @@ namespace KuaforApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AppointmentExists(int id)
+        public bool AppointmentExists(int id)
         {
             return _context.Appointments.Any(e => e.Id == id);
         }
