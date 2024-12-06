@@ -67,18 +67,20 @@ namespace KuaforApp.Controllers
         public IActionResult Create()
         {
             var employees = _context.Employees.ToList();
+            var salons = _context.Salons.ToList();
 
             // employee ıd sinden salon idsini alacağız
 
-            ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+            ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            // SelectList yerine serileştirilebilir bir listeye dönüştür
+            ViewBag.employeesName = new SelectList(employees, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
+            ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
 
+
+            ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
             ViewBag.EmployeeSalonID = _context.Employees.ToDictionary(e => e.Id, e => e.SalonId);
             ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
 
-
-            ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
-            ViewBag.employeesName = new SelectList(employees, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
-            ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
 
             return View();
         }
@@ -88,7 +90,7 @@ namespace KuaforApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SalonId,EmployeeId,Service,Date,Time,Price,UserId")] Appointment appointment)
+        public async Task<IActionResult> Create([Bind("Id,SalonId,EmployeeId,Service,Date,Time,Price")] Appointment appointment)
         {
             if (ModelState.IsValid)
             {
@@ -98,20 +100,61 @@ namespace KuaforApp.Controllers
                                                .Select(e => e.SalonId)
                                                .FirstOrDefault();
 
+                // Çalışanın uygunluk bilgilerini kontrol et
+                bool employeeIsAvailable = _context.Employees
+                                                   .Where(e => e.Id == appointment.EmployeeId)
+                                                   .Select(e => e.IsAvailable)
+                                                   .FirstOrDefault();
 
+                TimeOnly appointmentTime = TimeOnly.FromDateTime(appointment.Date); // Randevu zamanı
+                TimeOnly employeeStartTime = _context.Employees
+                                                     .Where(e => e.Id == appointment.EmployeeId)
+                                                     .Select(e => e.start_available)
+                                                     .FirstOrDefault();
+                TimeOnly employeeFinishTime = _context.Employees
+                                                      .Where(e => e.Id == appointment.EmployeeId)
+                                                      .Select(e => e.finish_available)
+                                                      .FirstOrDefault();
 
+                // Çalışma saatleri içinde mi kontrol et
+                if (!(employeeIsAvailable && employeeStartTime <= appointmentTime && employeeFinishTime >= appointmentTime))
+                {
+                    // Hataları ve formu tekrar göster
+                    var employees = _context.Employees.ToList();
+                    ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
+                                                                                 // SelectList yerine serileştirilebilir bir listeye dönüştür
+                    ViewBag.employeesName = new SelectList(employees, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
+                    ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
+
+                    ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+                    ViewBag.EmployeeSalonID = _context.Employees.ToDictionary(e => e.Id, e => e.SalonId);
+                    ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
+                    if (!employeeIsAvailable)
+                    {
+                        ModelState.AddModelError("", $"Seçtiğiniz çalışan, randevu için uygun değil.");
+
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", $"Seçtiğiniz çalışan, {appointment.Date:HH:mm} saatleri arasında uygun değil.");
+                    }
+                    return View(appointment);
+                }
+
+                // Randevuyu kaydet
                 _context.Add(appointment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            var employees = _context.Employees.ToList();
-            ViewBag.employee = employees;
+            //// Eğer ModelState geçerli değilse, formu tekrar göster
+            var employeesList = _context.Employees.ToList();
+            //ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+            //ViewBag.EmployeeSalonID = _context.Employees.ToDictionary(e => e.Id, e => e.SalonId);
+            //ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
 
-
-            ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
-            ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
-
+            ViewBag.employeesId = new SelectList(employeesList, "Id", "Id");
+            ViewBag.specialty = new SelectList(employeesList, "Id", "Specialty");
 
             return View(appointment);
         }

@@ -58,8 +58,13 @@ namespace KuaforApp.Controllers
 
 
         // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details()
         {
+            //if (User. == "E")
+            //{
+            //    RedirectToAction();
+            //}
+            int id = Convert.ToInt32(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
             if (id == null)
             {
                 return NotFound();
@@ -72,7 +77,7 @@ namespace KuaforApp.Controllers
                 return NotFound();
             }
 
-            return View(user);
+            return Vi021ew(user);
         }
 
         // GET: Users/Create

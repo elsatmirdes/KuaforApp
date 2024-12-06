@@ -11,32 +11,47 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-
-            <!-- Salon Seçimi -->
-            <div class="form-group">
-                <label asp-for="userID" class="control-label">Çalışan Seç</label>
-                <select asp-for="userID" class="form-control" asp-items="ViewBag.userName" id="userID" onchange="updateSalonDetails()">
-                    <option>--Çalışan Seçiniz--</option>
-                </select>
-            </div>
+            <br />
 
             <div class="form-group">
-                <label asp-for="Specialty" class="control-label"></label>
+                <label asp-for="Specialty" class="control-label">Çalışan işi</label>
                 <input asp-for="Specialty" class="form-control" />
                 <span asp-validation-for="Specialty" class="text-danger"></span>
             </div>
+            <br />
+            <!-- Salon Seçimi -->
+            <div class="form-group">
+                <label asp-for="userID" class="control-label">Çalışan Seç</label>
+                <select asp-for="userID" class="form-control" asp-items="ViewBag.userName" id="userID">
+                    <option>--Çalışan Seçiniz--</option>
+                </select>
+            </div>
+            <br />
+            <div class="form-group">
+                <label asp-for="start_available" class="control-label">Çalışma başlangıç zamanı</label>
+                <input asp-for="start_available" class="form-control" />
+                <span asp-validation-for="start_available" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <label asp-for="finish_available" class="control-label">Çalışma bitiş zamanı</label>
+                <input asp-for="finish_available" class="form-control" />
+                <span asp-validation-for="finish_available" class="text-danger"></span>
+            </div>
+            <br />
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
                 </label>
             </div>
-
+            <br />
             <!-- Salon Seçimi -->
             <div class="form-group">
                 <label asp-for="SalonId" class="control-label">Salon Seç</label>
@@ -44,7 +59,7 @@
                     <option>--Salon Seçiniz--</option>
                 </select>
             </div>
-
+            <br />
             <!-- Salon Bilgileri -->
 
             <div id="SalonDetails" style="margin-top: 20px;">
@@ -52,7 +67,7 @@
                 <p><strong>Telefon:</strong> <span id="SalonPhone"></span></p>
                 <p><strong>Adres:</strong> <span id="SalonAddress"></span></p>
             </div>
-
+            <br />
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

@@ -3,6 +3,7 @@ using System;
 using KuaforApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KuaforApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241204162515_employeeAddAvailabelty")]
+    partial class employeeAddAvailabelty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,11 +89,11 @@ namespace KuaforApp.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<TimeOnly>("finish_available")
-                        .HasColumnType("time without time zone");
+                    b.Property<DateTime>("finish_available")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<TimeOnly>("start_available")
-                        .HasColumnType("time without time zone");
+                    b.Property<DateTime>("start_available")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("userID")
                         .HasColumnType("integer");
