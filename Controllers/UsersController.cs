@@ -77,7 +77,7 @@ namespace KuaforApp.Controllers
                 return NotFound();
             }
 
-            return Vi021ew(user);
+            return View(user);
         }
 
         // GET: Users/Create
