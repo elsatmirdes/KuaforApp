@@ -21,19 +21,28 @@
             <p>Yapılacak İşlem : @item.Service</p>
         </a>
         <br />
-        <!-- Form -->
-        <form method="post" action="@Url.Action("acces_appointment", "Appointments")">
-            <input type="hidden" name="Id" value="@item.Id" />
-            <input type="hidden" name="SalonId" value="@item.SalonId" />
-            <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
-            <input type="hidden" name="Service" value="@item.Service" />
-            <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
-            <input type="hidden" name="Time" value="@item.Time" />
-            <input type="hidden" name="UserId" value="@item.UserId" />
-            <input type="hidden" name="Price" value="@item.Price" />
-            <input type="hidden" name="acceptAppointment" value="1" />
-            <button type="submit" class="btn btn-success mb-3">Randevuyu Onayla</button>
-        </form>
+        <div class="flex">
+            <!-- Form -->
+            <form method="post" action="@Url.Action("acces_appointment", "Appointments")">
+                <input type="hidden" name="Id" value="@item.Id" />
+                <input type="hidden" name="SalonId" value="@item.SalonId" />
+                <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
+                <input type="hidden" name="Service" value="@item.Service" />
+                <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
+                <input type="hidden" name="Time" value="@item.Time" />
+                <input type="hidden" name="UserId" value="@item.UserId" />
+                <input type="hidden" name="Price" value="@item.Price" />
+                <input type="hidden" name="acceptAppointment" value="1" />
+                <button type="submit" class="btn btn-success mb-3">Randevuyu Onayla</button>
+            </form>
+
+            <form>
+                <button type="submit" class="btn btn-danger mb-3 flex">Randevuyu Reddet</button>
+            </form>
+
+
+        </div>
+
 
     }
 

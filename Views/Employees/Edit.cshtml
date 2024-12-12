@@ -23,6 +23,19 @@
                 <input asp-for="Specialty" class="form-control" />
                 <span asp-validation-for="Specialty" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="start_available" class="control-label">Çalışma başlangıç saati</label>
+                <input asp-for="start_available" class="form-control" />
+                <span asp-validation-for="start_available" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="finish_available" class="control-label">Çalışma bitiş saati</label>
+                <input asp-for="finish_available" class="form-control" />
+                <span asp-validation-for="finish_available" class="text-danger"></span>
+            </div>
+
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)

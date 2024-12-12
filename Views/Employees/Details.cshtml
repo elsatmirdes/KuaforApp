@@ -4,6 +4,11 @@
     ViewData["Title"] = "Details";
 }
 
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
 <h1>Details</h1>
 
 <div>
@@ -34,9 +39,51 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.SalonId)
         </dd>
+        <dd class="col-sm-10" on>
+            <p id="getDailyEarnings"></p>
+        </dd>
+        <dd class="col-sm-10">
+            <p id="getTotalEarnings"></p>
+        </dd>
     </dl>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<script>
+    async function fetchDailyEarnings(endpoint,tag) {
+        try {
+            // Model'den gelen ID'yi kullan
+            const employeeId = @Model?.Id;
+
+            // API çağrısı
+            const response = await fetch(`/api/values/${endpoint}/${employeeId}`);
+
+            // Yanıt kontrolü
+            if (!response.ok) {
+                throw new Error(`API hatası: ${response.status}`);
+            }
+
+            // JSON verisini al
+            const data = await response.json();
+
+            // Gelen veriyi <p> tag'ına yazdır
+            const pTag = document.getElementById(`${tag}`);
+            pTag.innerHTML = `Günlük kazanç: ${data.totalEarnings.toFixed(2)} TL`;
+        } catch (error) {
+            console.error("API'den veri alınırken hata oluştu:", error);
+
+            // Hata durumunda kullanıcıya mesaj göster
+            const pTag = document.getElementById(`${tag}`);
+            pTag.innerHTML = "Kazanç yok.";
+        }
+    }
+
+
+
+    // Fonksiyonu çağır
+    fetchDailyEarnings("GetDailyEarningsByEmployee", "getDailyEarnings");
+    fetchDailyEarnings("GetTotalEarnings", "getTotalEarnings");
+</script>

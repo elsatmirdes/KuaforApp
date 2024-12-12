@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 [Authorize(Roles = "A")]
 public class AdminController : Controller
 {
+
     private readonly ApplicationDbContext _context;
 
     public AdminController(ApplicationDbContext context)

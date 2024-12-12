@@ -123,6 +123,7 @@ namespace KuaforApp.Controllers
             {
                 try
                 {
+                    employee.userID = _context.Employees.Where(e => e.Id == id).Select(e => e.userID).FirstOrDefault();
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }

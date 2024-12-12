@@ -37,6 +37,7 @@ namespace KuaforApp.Controllers
                 Service = a.Service,
                 Date = a.Date.ToLocalTime(), // UTC -> Yerel zaman dönüşümü
                 Time = a.Time,
+                UserId = a.UserId,
                 Price = a.Price
             })
             .ToList();
@@ -69,6 +70,7 @@ namespace KuaforApp.Controllers
             var employees = _context.Employees.ToList();
             var salons = _context.Salons.ToList();
 
+
             // employee ıd sinden salon idsini alacağız
 
             ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
@@ -94,6 +96,26 @@ namespace KuaforApp.Controllers
         {
             if (ModelState.IsValid)
             {
+
+
+                var appointment2 = await _context.Appointments
+                .Select(a => new Appointment
+                {
+                    Id = a.Id,
+                    SalonId = a.SalonId,
+                    EmployeeId = a.EmployeeId,
+                    Service = a.Service,
+                    Date = a.Date.ToLocalTime(), // UTC -> Yerel zaman dönüşümü
+                    Time = a.Time,
+                    UserId = a.UserId,
+                    Price = a.Price
+                }).ToListAsync();
+
+
+                var employees = _context.Employees.ToList();
+
+               
+
                 // EmployeeId'ye göre SalonId'yi bul
                 appointment.SalonId = _context.Employees
                                                .Where(e => e.Id == appointment.EmployeeId)
@@ -106,7 +128,7 @@ namespace KuaforApp.Controllers
                                                    .Select(e => e.IsAvailable)
                                                    .FirstOrDefault();
 
-                TimeOnly appointmentTime = TimeOnly.FromDateTime(appointment.Date); // Randevu zamanı
+                TimeOnly appointmentTime = TimeOnly.FromDateTime(appointment.Date.ToLocalTime()); // Randevu zamanı
                 TimeOnly employeeStartTime = _context.Employees
                                                      .Where(e => e.Id == appointment.EmployeeId)
                                                      .Select(e => e.start_available)
@@ -116,19 +138,53 @@ namespace KuaforApp.Controllers
                                                       .Select(e => e.finish_available)
                                                       .FirstOrDefault();
 
-                // Çalışma saatleri içinde mi kontrol et
-                if (!(employeeIsAvailable && employeeStartTime <= appointmentTime && employeeFinishTime >= appointmentTime))
-                {
-                    // Hataları ve formu tekrar göster
-                    var employees = _context.Employees.ToList();
-                    ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
-                                                                                 // SelectList yerine serileştirilebilir bir listeye dönüştür
-                    ViewBag.employeesName = new SelectList(employees, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
-                    ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
+                // Yeni randevunun başlangıç ve bitiş saatlerini belirleyin
+                TimeOnly appointmentStartTime = TimeOnly.FromDateTime(appointment.Date);
+                TimeOnly appointmentEndTime = appointmentStartTime.Add(appointment.Time);
 
-                    ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
-                    ViewBag.EmployeeSalonID = _context.Employees.ToDictionary(e => e.Id, e => e.SalonId);
-                    ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
+                // Hataları ve formu tekrar göster
+                ViewBag.employeesId = new SelectList(employees, "Id", "Id"); // SelectList: Id = Value, Name = Gösterilecek Değer
+                                                                             // SelectList yerine serileştirilebilir bir listeye dönüştür
+                ViewBag.employeesName = new SelectList(employees, "Id", "Name"); // SelectList: Id = Value, Name = Gösterilecek Değer
+                ViewBag.specialty = new SelectList(employees, "Id", "Specialty"); // SelectList: Id = Value, Name = Gösterilecek Değer
+
+                ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+                ViewBag.EmployeeSalonID = _context.Employees.ToDictionary(e => e.Id, e => e.SalonId);
+                ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
+
+                // Çalışanın mevcut randevularını alın
+                var existingAppointments = appointment2
+                    .Where(a => a.EmployeeId == appointment.EmployeeId && a.Date.Date == appointment.Date.Date) // Aynı gün içinde
+                    .ToList();
+
+                // Çakışmayı kontrol edin
+                bool isConflict = existingAppointments.Any(a =>
+                {
+                    TimeOnly existingStartTime = TimeOnly.FromDateTime(a.Date);
+                    TimeOnly existingEndTime = existingStartTime.Add(a.Time);
+
+                    TempData["addAppointmetStartTime"] = appointmentStartTime.ToString();
+                    TempData["dbAppointmetExistEndTime"] = existingEndTime.ToString();
+                    TempData["addAppointmetEndTime"] = appointmentEndTime.ToString();
+                    TempData["dbAppointmetExistStartTime"] = existingStartTime.ToString();
+
+                    return (appointmentStartTime > existingStartTime && appointmentStartTime < existingEndTime)|| (appointmentEndTime > existingStartTime && appointmentEndTime < existingEndTime);
+                });
+
+
+                if (isConflict)
+                {
+                    ModelState.AddModelError("", "Seçtiğiniz saat dilimi, çalışanın başka bir randevusu ile çakışıyor.");
+
+
+
+                    return View(appointment);
+                }
+
+                // Çalışma saatleri içinde mi kontrol et
+                if (!(employeeIsAvailable && employeeStartTime <= appointmentStartTime && employeeFinishTime >= appointmentEndTime))
+                {
+
                     if (!employeeIsAvailable)
                     {
                         ModelState.AddModelError("", $"Seçtiğiniz çalışan, randevu için uygun değil.");
@@ -301,9 +357,20 @@ namespace KuaforApp.Controllers
             {
                 return NotFound();
             }
-
             var appointment = await _context.Appointments
-                .FirstOrDefaultAsync(m => m.Id == id);
+            .Select(a => new Appointment
+            {
+                Id = a.Id,
+                SalonId = a.SalonId,
+                EmployeeId = a.EmployeeId,
+                Service = a.Service,
+                Date = a.Date.ToLocalTime(), // UTC -> Yerel zaman dönüşümü
+                Time = a.Time,
+                UserId = a.UserId,
+                Price = a.Price
+            })
+            .Where(a => a.Id == id).FirstOrDefaultAsync();
+
             if (appointment == null)
             {
                 return NotFound();

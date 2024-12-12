@@ -64,7 +64,8 @@
                     @Html.DisplayFor(modelItem => item.Price) <p> TL</p>
             </td>
 
-                @if (User.IsInRole("U"))
+                
+                @if (User.IsInRole("U") && Convert.ToInt32(item.UserId) == -1)
                 {
                     <td>
                         <!-- Form -->
@@ -78,6 +79,12 @@
                             <input type="hidden" name="Price" value="@item.Price" />
                             <button type="submit" class="btn btn-success mb-3">Randevu Al</button>
                         </form>
+                    </td>
+                }
+                @if (User.IsInRole("U") && Convert.ToInt32(item.UserId) >= 0)
+                {
+                    <td>
+                        <p>Randevu alınmış</p>
                     </td>
                 }
 
@@ -106,6 +113,13 @@
     </form>
 
 }
+
+<div class="alert alert-success">
+    @TempData["addAppointmetStartTime"]
+    @TempData["dbAppointmetExistEndTime"]
+    @TempData["addAppointmetEndTime"]
+    @TempData["dbAppointmetExistStartTime"]
+</div>
 
 @if (User.IsInRole("E"))
 {
