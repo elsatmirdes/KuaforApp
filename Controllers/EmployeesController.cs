@@ -72,7 +72,7 @@ namespace KuaforApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
+            
             var salons = _context.Salons.ToList(); // Tüm salonları çekiyoruz
             var userList = _context.Users.Where(r => r.Role == "E").ToList();
 
@@ -112,7 +112,7 @@ namespace KuaforApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Specialty,IsAvailable,SalonId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Specialty,IsAvailable,SalonId,finish_available,start_available")] Employee employee)
         {
             if (id != employee.Id)
             {

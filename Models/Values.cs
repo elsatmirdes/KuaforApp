@@ -8,6 +8,6 @@ namespace KuaforApp.Models
         public int employeeID { get; set; }
         public decimal TotalEarnings { get; set; }
 
-
+        public int userID { get; set; }
     }
 }

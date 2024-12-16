@@ -1,37 +1,77 @@
 ﻿@model KuaforApp.Models.Appointment
-
 @{
     ViewData["Title"] = "User Appointments";
 }
 
-<div class="list-group">
-    <br />
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+        <h1 class="display-5">User Appointments</h1>
+        <p class="text-muted">Saç stili ve rengi için yapay zeka önerisi alın ve randevularınızı yönetin.</p>
+    </div>
 
-    @foreach (var item in ViewBag.userAppointments)
+    <!-- Fotoğraf Yükleme Formu -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Fotoğraf Yükle</h5>
+            <form asp-action="userAppointments" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="photo" class="form-label">Fotoğraf Yükle:</label>
+                    <input type="file" name="photo" id="photo" class="form-control" accept="image/*" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Öneri Al</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Yapay Zeka Önerisi Bölümü -->
+    @if (ViewBag.EditedImageUrl != null)
     {
-
-        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
-
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">@item.Date.ToString("dd-MM-yyyy H:mm")</h5>
-                
-            </div>
-            <p class="mb-1">Salon Adı : @ViewBag.SalonNames[item.SalonId]</p>
-            <p class="mb-1">Çalışan Adı : @ViewBag.EmployeeName[item.EmployeeId]</p>
-        </a>
-
-        @if (item.acceptAppointment == 0)
-        {
-            <p style="background-color:yellow;">Randevunuz çalışan tarafından onay bekliyor.</p>
-        }
-        @if (item.acceptAppointment == 1)
-        {
-            <p style="background-color:green;">Randevunuz çalışan tarafından onaylanmıştır.</p>
-        }
-        @if (item.acceptAppointment == -1)
-        {
-            <p style="background-color:orangered;">Randevunuz çalışan tarafından reddedildi.</p>
-        }
-        <br />
+        <div class="alert alert-info text-center">
+            <h5>Saç Stili ve Rengi İçin Yapay Zeka Önerisi:</h5>
+            <p>@ViewBag.EditedImageUrl</p>
+        </div>
     }
+    else if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger text-center">
+            <p>@ViewBag.Error</p>
+        </div>
+    }
+
+    <!-- Randevu Listesi -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Randevularınız</h5>
+            <div class="list-group">
+                @foreach (var item in ViewBag.userAppointments)
+                {
+                    <a href="#" class="list-group-item list-group-item-action mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">@item.Date.ToString("dd-MM-yyyy H:mm")</h6>
+                                <small class="text-muted">Salon Adı: @ViewBag.SalonNames[item.SalonId]</small><br />
+                                <small class="text-muted">Çalışan Adı: @ViewBag.EmployeeName[item.EmployeeId]</small>
+                            </div>
+
+                            @if (item.acceptAppointment == 0)
+                            {
+                                <span class="badge bg-warning text-dark">Onay Bekliyor</span>
+                            }
+                            else if (item.acceptAppointment == 1)
+                            {
+                                <span class="badge bg-success">Onaylandı</span>
+                            }
+                            else if (item.acceptAppointment == -1)
+                            {
+                                <span class="badge bg-danger">Reddedildi</span>
+                            }
+                        </div>
+                    </a>
+                }
+
+
+            </div>
+        </div>
+    </div>
 </div>

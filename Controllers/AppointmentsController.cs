@@ -9,16 +9,33 @@ using KuaforApp.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using NuGet.Versioning;
+using OpenAI.Chat;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using Newtonsoft.Json;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json.Linq;
 
 namespace KuaforApp.Controllers
 {
     public class AppointmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiKey = "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";
+        private static readonly string ApiKey = "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"; // API anahtarınızı buraya ekleyin
+        private static readonly string ApiEndpoint = "https://api.groq.com/openai/v1/chat/completions"; // API endpoint adresi
+        private readonly IWebHostEnvironment _environment;
 
-        public AppointmentsController(ApplicationDbContext context)
+        public AppointmentsController(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _httpClient = new HttpClient();
+            _environment = environment;
+
         }
 
         // GET: Appointments
@@ -241,10 +258,112 @@ namespace KuaforApp.Controllers
             })
             .ToList();
 
+            ViewBag.EditedImageUrl = null;
+            return View();
+        }
 
+        [Authorize(Roles = "U")]
+        [HttpPost]
+        public async Task<IActionResult> userAppointments(IFormFile photo)
+        {
+            var userID = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            ViewBag.userid = userID;
+            ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
+            ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+
+            ViewBag.userAppointments = _context.Appointments
+            .Where(a => a.UserId == userID)
+            .Select(a => new Appointment
+            {
+                Id = a.Id,
+                SalonId = a.SalonId,
+                EmployeeId = a.EmployeeId,
+                Service = a.Service,
+                Date = a.Date.ToLocalTime(), // Tarihi yerel zamana dönüştür
+                Time = a.Time,
+                Price = a.Price,
+                acceptAppointment = a.acceptAppointment,
+                UserId = a.UserId
+            })
+            .ToList();
+
+            if (photo != null && photo.Length > 0)
+            {
+                string apiKey = _apiKey; // API anahtarınız burada
+               
+                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
+
+               
+
+                // Fotoğrafı Base64 formatına çevirin
+                string base64Image;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await photo.CopyToAsync(memoryStream);
+                    byte[] byteArray = memoryStream.ToArray();
+                    base64Image = Convert.ToBase64String(byteArray);
+                }
+
+                // JSON Mesajı Oluşturma
+                var messagePayload = new
+                {
+                    model = "llama-3.2-11b-vision-preview",
+                    messages = new[]
+                    {
+                        new
+                        {
+                            role = "user",
+                            content = new object[]
+                            {
+                                new { type = "text", text = "Can you give me some suggestions about hair style and hair color for the person in this photo?" },
+                                new
+                                {
+                                    type = "image_url",
+                                    image_url = new { url = $"data:image/jpeg;base64,{base64Image}" }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
+
+                    var jsonPayload = JsonConvert.SerializeObject(messagePayload);
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PostAsync(ApiEndpoint, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        var jsonResponse = JObject.Parse(responseContent);
+                        var message = jsonResponse["choices"]?[0]?["message"]?["content"]?.ToString();
+
+                        // Yanıtı ViewBag'e ata
+                        //ViewBag.ResponseMessage = message;
+                        ViewBag.EditedImageUrl  = message;
+                        return View();
+                    }
+                    ViewBag.EditedImageUrl = "API isteği başarısız";
+
+                    return View();
+                }
+
+                // API'ye istek gönderme
+            }
+        
+            else
+            {
+                ViewBag.Error = "Lütfen bir fotoğraf yükleyin.";
+            }
 
             return View();
         }
+
+
 
         [Authorize(Roles = "E")]
         public IActionResult EmployeeAppointments()

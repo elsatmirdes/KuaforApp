@@ -27,8 +27,15 @@ namespace KuaforApp.Controllers
                 .SumAsync(a => (decimal?)a.Price) ?? 0;
 
             Values employeEarnings = await _context.Appointments
-           .Select(x => new Values() { employeeID = x.EmployeeId, appointmentID = x.Id, TotalEarnings = totalEarnings })
-           .FirstOrDefaultAsync(x => x.employeeID == id);
+                .Where(x => x.UserId > 0) // userID değeri 0'dan büyük olanları filtrele
+                .Select(x => new Values()
+                {
+                    employeeID = x.EmployeeId,
+                    appointmentID = x.Id,
+                    TotalEarnings = totalEarnings,
+                    userID = x.UserId
+                })
+                .FirstOrDefaultAsync(x => x.employeeID == id);
 
             if (employeEarnings == null)
                 return NotFound("İstenilen çalışan bulunamadı");
@@ -45,8 +52,15 @@ namespace KuaforApp.Controllers
                 .SumAsync(a => (decimal?)a.Price) ?? 0;
 
             Values employeEarnings = await _context.Appointments
-           .Select(x => new Values() { employeeID = x.EmployeeId, appointmentID = x.Id, TotalEarnings = totalEarnings })
-           .FirstOrDefaultAsync(x => x.employeeID == id);
+                .Where(x => x.UserId > 0) // userID değeri 0'dan büyük olanları filtrele
+                .Select(x => new Values()
+                {
+                    employeeID = x.EmployeeId,
+                    appointmentID = x.Id,
+                    TotalEarnings = totalEarnings,
+                    userID = x.UserId
+                })
+                .FirstOrDefaultAsync(x => x.employeeID == id);
 
             if (employeEarnings == null)
                 return NotFound("İstenilen çalışan bulunamadı");
