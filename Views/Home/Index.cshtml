@@ -1,8 +1,74 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Anasayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="hero-section d-flex align-items-center justify-content-center text-center">
+    <div class="text-white">
+        <h1 class="display-4 fw-bold" style="color: deepskyblue;">Kuaför Uygulamasına Hoş Geldiniz</h1>
+        <p class="lead" style="color: dodgerblue;">En iyi kuaför ve berber hizmetini kolayca bulmak ve randevu almak artık çok kolay!</p>
+
+    </div>
 </div>
+<a href="/Appointments" class="btn btn-primary btn-lg  d-flex align-items-center justify-content-center mt-3">
+    <i class="fas fa-calendar-check"></i> Randevu Al
+</a>
+<!-- Features Section -->
+<section class="features-section text-center py-5">
+    <div class="container">
+        <h2 class="mb-5">Neden Bizi Seçmelisiniz?</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card feature-card p-4 shadow">
+                    <i class="fas fa-cut fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Profesyonel Hizmet</h5>
+                    <p class="card-text">Alanında uzman kuaför ve berberlerimizle kaliteli hizmet sunuyoruz.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-4 shadow">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Zaman Kazanın</h5>
+                    <p class="card-text">Kolay randevu sistemi ile zamandan tasarruf edin.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-4 shadow">
+                    <i class="fas fa-smile fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Mutlu Müşteriler</h5>
+                    <p class="card-text">Memnuniyetiniz bizim için her şeyden önemli.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section text-center py-5 bg-secondary text-white">
+    <div class="container">
+        <h2 class="mb-4">Bize Ulaşın</h2>
+        <p>Herhangi bir sorunuz veya öneriniz varsa bizimle iletişime geçin.</p>
+        <a href="/Contact/Index" class="btn btn-light btn-lg mt-2">
+            <i class="fas fa-phone-alt"></i> İletişime Geçin
+        </a>
+    </div>
+</section>
+
+@section Scripts {
+    <style>
+        .hero-section {
+            background: url('berberFOTO.jpg') no-repeat center center/cover;
+            height: 100vh;
+            position: relative;
+            margin-top: -56px; /* Navbar yüksekliğini kapatır */
+            z-index: -1;
+        }
+
+            .hero-section .text-white {
+                z-index: 1;
+                background: rgba(0, 0, 0, 0.5); /* Yazının okunabilirliği için arkaplan */
+                padding: 2rem;
+                border-radius: 10px;
+            }
+    </style>
+}
