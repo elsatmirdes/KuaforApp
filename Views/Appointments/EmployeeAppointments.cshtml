@@ -1,49 +1,78 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "EmployeeAppointments";
 }
 
-<h1>EmployeeAppointments</h1>
+<h1 class="mb-4 text-center">Employee Appointments</h1>
 
-
-<div class="list-group">
-    <br />
-
+<div class="container">
     @foreach (var item in ViewBag.employeeAppointments)
     {
+        <!-- Randevu Kartı -->
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <!-- Randevu Bilgileri -->
+                <h5 class="card-title">
+                    <strong>Randevu Tarihi:</strong> @item.Date.ToString("dd-MM-yyyy H:mm")
+                </h5>
 
-        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+                @if (item.UserId == -1)
+                {
+                    <p class="text-secondary fw-bold">Randevu Daha Talep Edilmemiş</p>
+                }
+                else
+                {
+                    <p class="card-text">
+                        <strong>Müşteri Adı Soyadı:</strong>
+                        @(ViewBag.userName.ContainsKey(item.UserId) ? ViewBag.userName[item.UserId] : "Bilinmeyen Kullanıcı")
+                    </p>
+                    <p class="card-text"><strong>Yapılacak İşlem:</strong> @item.Service</p>
+                }
 
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Randevu Tarihi : @item.Date.ToString("dd-MM-yyyy H:mm")</h5>
+                <!-- Randevu Durumu -->
+                @if (item.acceptAppointment == 1)
+                {
+                    <p class="text-success fw-bold mb-3">Durum: Randevu Onaylandı</p>
+                }
+                else if (item.acceptAppointment == -1)
+                {
+                    <p class="text-danger fw-bold mb-3">Durum: Randevu Reddedildi</p>
+                }
+                else
+                {
+                    <p class="text-warning fw-bold mb-3">Durum: Onay Bekliyor</p>
+                }
+
+                <!-- Randevuyu Onayla ve Reddet Butonları -->
+                <div class="d-flex gap-2">
+                    <!-- Randevuyu Onayla -->
+                    <form method="post" action="@Url.Action("acces_appointment", "Appointments")">
+                        <input type="hidden" name="Id" value="@item.Id" />
+                        <input type="hidden" name="SalonId" value="@item.SalonId" />
+                        <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
+                        <input type="hidden" name="Service" value="@item.Service" />
+                        <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
+                        <input type="hidden" name="Time" value="@item.Time" />
+                        <input type="hidden" name="UserId" value="@item.UserId" />
+                        <input type="hidden" name="Price" value="@item.Price" />
+                        <input type="hidden" name="acceptAppointment" value="1" />
+                        <button type="submit" class="btn btn-success btn-sm">Randevuyu Onayla</button>
+                    </form>
+
+                    <!-- Randevuyu Reddet -->
+                    <form method="post" action="@Url.Action("reject_appointment", "Appointments")">
+                        <input type="hidden" name="Id" value="@item.Id" />
+                        <input type="hidden" name="SalonId" value="@item.SalonId" />
+                        <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
+                        <input type="hidden" name="Service" value="@item.Service" />
+                        <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
+                        <input type="hidden" name="Time" value="@item.Time" />
+                        <input type="hidden" name="UserId" value="@item.UserId" />
+                        <input type="hidden" name="Price" value="@item.Price" />
+                        <input type="hidden" name="acceptAppointment" value="-1" />
+                        <button type="submit" class="btn btn-danger btn-sm">Randevuyu Reddet</button>
+                    </form>
+                </div>
             </div>
-            <p>Müşteri Adı Soyadı : @ViewBag.userName[item.UserId]</p>
-            <p>Yapılacak İşlem : @item.Service</p>
-        </a>
-        <br />
-        <div class="flex">
-            <!-- Form -->
-            <form method="post" action="@Url.Action("acces_appointment", "Appointments")">
-                <input type="hidden" name="Id" value="@item.Id" />
-                <input type="hidden" name="SalonId" value="@item.SalonId" />
-                <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
-                <input type="hidden" name="Service" value="@item.Service" />
-                <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
-                <input type="hidden" name="Time" value="@item.Time" />
-                <input type="hidden" name="UserId" value="@item.UserId" />
-                <input type="hidden" name="Price" value="@item.Price" />
-                <input type="hidden" name="acceptAppointment" value="1" />
-                <button type="submit" class="btn btn-success mb-3">Randevuyu Onayla</button>
-            </form>
-
-            <form>
-                <button type="submit" class="btn btn-danger mb-3 flex">Randevuyu Reddet</button>
-            </form>
-
-
         </div>
-
-
     }
-
 </div>

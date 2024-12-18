@@ -418,6 +418,31 @@ namespace KuaforApp.Controllers
             return View(appointment);
         }
 
+        public async Task<IActionResult> reject_appointment(int id, [Bind("Id,SalonId,EmployeeId,Service,Date,Time,Price,acceptAppointment,UserId")] Appointment appointment)
+        {
+            if (id != appointment.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(appointment);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return NotFound();
+
+                }
+                return View();
+            }
+            return View(appointment);
+        }
+
+
         // GET: Appointments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
