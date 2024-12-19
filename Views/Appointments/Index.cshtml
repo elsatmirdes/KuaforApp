@@ -4,7 +4,6 @@
     ViewData["Title"] = "Randevu İşlemleri";
 }
 
-<h1>Index</h1>
 @if (User.IsInRole("A"))
 { 
     <p>
@@ -13,117 +12,97 @@
     </p>
 }
 
-<table class="table">
-    <thead>
-        <label for="date1">Tarih seçin : </label>
-        <input type="date" id="date1" name="birthday">
-        <tr>
-            <th>
-                Salon
-            </th>
-            <th>
-                Çalışan Adı
-            </th>
-            <th>
-                İşlem
-            </th>
-            <th>
-                Randevu Tarihi
-            </th>
-            <th>
-                İşlem Süresi
-            </th>
-            <th>
-                Ücret
-            </th>
 
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<h1 class="mb-4 text-center">Randevu İşlemleri</h1>
 
-
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @ViewBag.SalonNames[item.SalonId]
-            </td>
-            <td>
-                @ViewBag.EmployeeName[item.EmployeeId]
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Service)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Time)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Price) <p> TL</p>
-            </td>
-
-                
-                @if (User.IsInRole("U") && Convert.ToInt32(item.UserId) == -1)
-                {
-                    <td>
-                        <!-- Form -->
-                        <form method="post" action="@Url.Action("forUserAddAppointment", "Users")">
-                            <input type="hidden" name="Id" value="@item.Id" />
-                            <input type="hidden" name="SalonId" value="@item.SalonId" />
-                            <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
-                            <input type="hidden" name="Service" value="@item.Service" />
-                            <input type="hidden" name="Date" value="@item.Date.ToString("dd-MM-yyyy H:mm")" />
-                            <input type="hidden" name="Time" value="@item.Time" />
-                            <input type="hidden" name="Price" value="@item.Price" />
-                            <button type="submit" class="btn btn-success mb-3">Randevu Al</button>
-                        </form>
-                    </td>
-                }
-                @if (User.IsInRole("U") && Convert.ToInt32(item.UserId) >= 0)
-                {
-                    <td>
-                        <p>Randevu alınmış</p>
-                    </td>
-                }
-
-
-                @if (User.IsInRole("A"))
-                {
-                    //here blocks that you want to show to users with Admin role
-                <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-                }
-
-        </tr>
-}
-
-    </tbody>
-
-
-</table>
-@if (User.IsInRole("U"))
-{
-    <form>
-        <button asp-controller="Appointments" asp-action="userAppointments" type="submit" class="btn btn-primary" style="width:150px">Randevularım</button>
+<!-- Tarih Seçimi Formu ve Tüm Randevuları Gör -->
+<div class="mb-4">
+    <form method="get" action="@Url.Action("filtered", "Appointments")" class="d-inline">
+        <label for="selectedDate" class="form-label">Tarih Seçin:</label>
+        <input type="date" id="selectedDate" name="selectedDate" class="form-control w-25 d-inline" />
+        <button type="submit" class="btn btn-primary ms-2">Randevuları Göster</button>
     </form>
-
-}
-
-<div class="alert alert-success">
-    @TempData["addAppointmetStartTime"]
-    @TempData["dbAppointmetExistEndTime"]
-    @TempData["addAppointmetEndTime"]
-    @TempData["dbAppointmetExistStartTime"]
+    <a href="@Url.Action("Index", "Appointments")" class="btn btn-secondary ms-3">Tüm Randevuları Gör</a>
 </div>
 
+<!-- Randevu Kartları -->
+<div class="row">
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-warning">
+                Seçtiğiniz tarihe ait randevu bulunamadı.
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Randevu Tarihi: @item.Date.ToString("dd-MM-yyyy H:mm")
+                        </h5>
+                        <p class="card-text">
+                            <strong>Salon:</strong> @ViewBag.SalonNames[item.SalonId] <br />
+                            <strong>Çalışan:</strong> @ViewBag.EmployeeName[item.EmployeeId] <br />
+                            <strong>İşlem:</strong> @item.Service <br />
+                            <strong>Ücret:</strong> @item.Price TL
+                        </p>
+
+                        <!-- Randevu Durumu -->
+                        @if (item.UserId == -1)
+                        {
+                            <p class="text-secondary">Durum: Randevu Alınmamış</p>
+                            <!-- Kullanıcı Randevu Alabilir -->
+                            @if (User.IsInRole("U"))
+                            {
+                                <form method="post" action="@Url.Action("forUserAddAppointment", "Users")">
+                                    <input type="hidden" name="Id" value="@item.Id" />
+                                    <input type="hidden" name="SalonId" value="@item.SalonId" />
+                                    <input type="hidden" name="EmployeeId" value="@item.EmployeeId" />
+                                    <input type="hidden" name="Service" value="@item.Service" />
+                                    <input type="hidden" name="Date" value="@item.Date" />
+                                    <input type="hidden" name="Time" value="@item.Time" />
+                                    <input type="hidden" name="Price" value="@item.Price" />
+                                    <button type="submit" class="btn btn-sm btn-success">Randevu Al</button>
+                                </form>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-success">Durum: Randevu Alınmış</p>
+                        }
+
+                        <!-- Admin İşlemleri -->
+                        @if (User.IsInRole("A"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Düzenle</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detay</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+
+<!-- Kullanıcı Randevularım Butonu -->
+@if (User.IsInRole("U"))
+{
+    <form method="get" action="@Url.Action("userAppointments", "Appointments")" class="mt-4">
+        <button type="submit" class="btn btn-primary" style="width:150px">Randevularım</button>
+    </form>
+}
+
+<!-- Çalışana Özel Randevular -->
 @if (User.IsInRole("E"))
 {
-    <form>
-        <button asp-controller="Appointments" asp-action="EmployeeAppointments" type="submit" class="btn btn-primary" style="width:150px">Adıma Alınan Randevular</button>
+    <form method="get" action="@Url.Action("EmployeeAppointments", "Appointments")" class="mt-4">
+        <button type="submit" class="btn btn-primary" style="width:150px">Adıma Alınan Randevular</button>
     </form>
 }

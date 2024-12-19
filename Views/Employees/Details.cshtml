@@ -71,7 +71,14 @@
 
             // Gelen veriyi <p> tag'ına yazdır
             const pTag = document.getElementById(`${tag}`);
-            pTag.innerHTML = `Günlük kazanç: ${data.totalEarnings.toFixed(2)} TL`;
+            if (tag == "getDailyEarnings") {
+                pTag.innerHTML = `Günlük kazanç: ${data.totalEarnings.toFixed(2)} TL`;
+
+            }
+            else {
+                pTag.innerHTML = `Toplam kazanç: ${data.totalEarnings.toFixed(2)} TL`;
+
+            }
         } catch (error) {
             console.error("API'den veri alınırken hata oluştu:", error);
 

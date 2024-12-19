@@ -39,8 +39,11 @@ namespace KuaforApp.Controllers
         }
 
         // GET: Appointments
+        [HttpGet("Appointments")]
         public async Task<IActionResult> Index()
         {
+
+
 
             ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
             ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
@@ -60,7 +63,38 @@ namespace KuaforApp.Controllers
             .ToList();
 
 
+
+
             return View(appointments);
+        }
+        [HttpGet("Appointments/filtered")]
+        public async Task<IActionResult> Index(DateTime? selectedDate)
+        {
+            // ViewBag ile ek bilgiler
+            ViewBag.SalonNames = _context.Salons.ToDictionary(s => s.Id, s => s.Name);
+            ViewBag.EmployeeName = _context.Employees.ToDictionary(e => e.Id, e => e.Name);
+            var appointments = _context.Appointments.AsQueryable();
+
+            // Tarih filtresi varsa uygula
+            if (selectedDate.HasValue)
+            {
+                appointments = appointments.Where(a => a.Date.Date == selectedDate.Value.Date).Select(a => new Appointment
+                {
+                    Id = a.Id,
+                    SalonId = a.SalonId,
+                    EmployeeId = a.EmployeeId,
+                    Service = a.Service,
+                    Date = a.Date.ToLocalTime(), // UTC -> Yerel zaman dönüşümü
+                    Time = a.Time,
+                    UserId = a.UserId,
+                    Price = a.Price
+                });
+            }
+
+
+
+            // Listeye dönüştür
+            return View(appointments.ToList());
         }
 
         // GET: Appointments/Details/5
